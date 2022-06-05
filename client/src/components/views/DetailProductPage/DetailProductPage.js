@@ -11,14 +11,11 @@ function DetailProductPage(props) {
     const [Product, setProduct] = useState({})
 
     useEffect(() => {
-      
-        axios.get(`/api/product/products_by_id?id=${productId}&type=single`).then(response => {
-            if(response.data.success){        
-                setProduct(response.data.product[0])
-            }else {
-                alert("Failed to get details")
-            }
-        })  
+        axios.get(`/api/product/products_by_id?id=${productId}&type=single`)
+            .then(response => {
+                setProduct(response.data[0])
+            })
+            .catch(err => alert(err))
     }, [])
     
 
@@ -33,7 +30,7 @@ function DetailProductPage(props) {
             <Col lg={12} sm={24}>
                 <ProductImage detail={Product}/>
             </Col>
-            <Col lg={12} sm={24}>
+            <Col lg={12} sm ={24}>
                 <ProductInfo detail={Product}/> 
             </Col>
                 

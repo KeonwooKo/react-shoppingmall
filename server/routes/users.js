@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { Product } = require('../models/Product');
 const { User } = require("../models/User");
 const { auth } = require("../middleware/auth");
 
@@ -115,5 +116,34 @@ router.post("/addToCart", auth, (req, res) => {
         }
         )
 });
+
+router.get('/removeFromCart', auth, (req, res) => {
+    //먼저 카트안에 지우려고 했던 상품 지워주기
+    User.findOneAndUpdate(
+        {_id: req.user._id},
+        {
+            "$pull": {
+                "cart" : { "id": req.query.id}
+            }
+        },
+        {new: true},
+        (err, userInfo) => {
+            let cart = userInfo.cart
+            let array = cart.map(item => {
+                return item.id
+            })
+            //남아있는 상품의 정보를 다시 가져오기
+            Product.find({ _id: { $in: array } })
+                .populate("writer")
+                .exec((err, productInfo) => {
+                     return res.status(200).json({ 
+                        productInfo,
+                        cart 
+                })
+                }) 
+
+        }
+    )
+}) 
 
 module.exports = router;
