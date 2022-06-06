@@ -1,19 +1,41 @@
-Hello, My Friends  
-Thank you for having interest in this repository ! 
+# 3-3 Web 과제
 
-To use this application, 
+-쇼핑몰 제작
 
-1. make dev.js file inside config folder 
-2. put mongoDB info into dev.js file 
-3. Type  " npm install " inside the root directory  ( Download Server Dependencies ) 
-4. Type " npm install " inside the client directory ( Download Front-end Dependencies )
+# 개발환경
+
+backend: node.js, express.js
 
 
-If you have problem, feel free to ask me ^^ 
-
-You can watch the tutorial for this app.
-
-https://www.youtube.com/channel/UCFyXA9x8lpL3EYWeYhj4C4Q?view_as=subscriber
+frontend: javaScript, reactJS
 
 
-# react-shoppingmall
+database: mongoDB
+
+
+style: Ant Design
+
+
+# 제작
+
+쇼핑몰
+- 로그인/로그아웃, 회원가입
+- 상품 업로드, 상품 상세페이지
+- 카트, 
+
+
+# 제작기간
+
+6.2-6.6;
+
+
+# FeedBack
+
+너무 급하게 했기에, 카트으 수량 기능을 추가하여, 나만의 스타일의 쇼핑몰로 다시 만들 것
++ 나를 소개하느 레쥬메 사이트 만들 것(8월까지)
+
+
+# 참조
+
+Inflearn - John Ahn
+
