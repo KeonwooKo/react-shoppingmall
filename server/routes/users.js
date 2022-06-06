@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Product } = require('../models/Product');
+const { Payment } = require('../models/Payment');
 const { User } = require("../models/User");
 const { auth } = require("../middleware/auth");
+const aysnc = require('async');
 
 //=================================
 //             User
@@ -144,6 +146,79 @@ router.get('/removeFromCart', auth, (req, res) => {
 
         }
     )
+}) 
+
+router.post('/successBuy', auth, (req, res) => {
+    
+    //user collection안의 history 필드에 간단한 정보 넣어주기
+    let history = [];
+    let transactionData = {};
+    
+    req.body.cartDetail.forEach((item) => {
+        history.push({
+        dateOfPurchase: Date.now(),
+        name: item.title,
+        id: item._id,
+        price: item.price,
+        quantity: item.quantity,
+        paymentId: req.body.paymentData.paymentID
+        }) 
+    })
+
+    //Payment collection안에 자세한 결제 정보 넣어주기
+    transactionData.user = {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+    }
+    transactionData.data = req.body.paymentData 
+    transactionData.product = history
+
+
+    User.findOneAndUpdate(
+        {_id: req.user._id},
+        { $push : {history: history}, $set : {cart: []}},
+        {new: true},
+        (err, user) => {
+            if(err) return res.json({ success: false, err })
+            
+            //Payment에 transactionData 저장
+            const payment = new Payment(transactionData)
+            payment.save((err, doc) => {
+                if(err) return res.json({ success: false , err})
+
+                //Production collection안의 sold필드 업데이트
+
+                //상품 당 몇개 구매했는지
+                let products = [];
+                doc.product.forEach(item => {
+                    products.push({id: item.id, quantity: item.quantity})
+
+                    aysnc.eachSeries(products, (item, callback) => {
+                        Product.update(
+                            { _id: item.id},
+                            {
+                                $inc: {
+                                    "sold" : item.quantity
+                                }
+                            },
+                            { new: false},
+                            callback
+                        )
+                    }, (err) => {
+                        if(err) return res.status(400).json({ success: false, err })
+                        res.status(200).json({ 
+                            success: true, 
+                            cart: user.cart,
+                            cartDetail: []    
+                        })
+                    }
+                    )
+                })
+            })
+        }
+    )
+
 }) 
 
 module.exports = router;
